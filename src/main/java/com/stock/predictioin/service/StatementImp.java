@@ -3,6 +3,7 @@ package com.stock.predictioin.service;
 import com.stock.predictioin.dto.StatementsDto;
 import com.stock.predictioin.entity.Company;
 import com.stock.predictioin.entity.Statements;
+import com.stock.predictioin.exceptionHandler.ResourceNotFoundException;
 import com.stock.predictioin.repository.CompanyRepo;
 import com.stock.predictioin.repository.StatementsRepo;
 import org.modelmapper.ModelMapper;
@@ -35,6 +36,11 @@ public class StatementImp {
         lists.add(statements);
 
         Company company = companyRepo.findByName(stock);
+
+        if(company == null){
+            throw new ResourceNotFoundException("No Company with this name exist in our records");
+        }
+
         statements.setCName(company.getName());
 
         statements.setCompany(company);
@@ -45,6 +51,9 @@ public class StatementImp {
 
     public List<StatementsDto> getStatementByStockName(String stock){
         Company company = companyRepo.findByName(stock);
+        if(company == null){
+            throw new ResourceNotFoundException("No Company with this name exist in our records");
+        }
         List<Statements> statements = company.getStatements();
         return statements.stream().map((statements1 -> modelMapper.map(statements1,StatementsDto.class))).toList();
     }
