@@ -20,6 +20,8 @@ public class Company {
 
     private String name;
 
+    private String Code;
+
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Statements> statements;
 

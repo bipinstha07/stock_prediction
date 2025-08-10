@@ -23,7 +23,7 @@ public class Statements {
 
     private String news;
 
-    private String CompanyName;
+    private String cName;
 
     @ManyToOne
     private Company company;

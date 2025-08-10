@@ -20,10 +20,11 @@ public class CompanyImp {
         this.modelMapper = modelMapper;
     }
 
-    public CompanyDto addCompany(String companyName){
+    public CompanyDto addCompany(String companyName,String companyCode){
         Company company = new Company();
         company.setId(UUID.randomUUID().toString());
         company.setName(companyName);
+        company.setCode(companyCode);
         Company companySaved = companyRepo.save(company);
         return modelMapper.map(companySaved,CompanyDto.class);
     }

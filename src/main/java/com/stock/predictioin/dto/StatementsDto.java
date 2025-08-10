@@ -15,7 +15,7 @@ public class StatementsDto {
 
     private String id;
     private String news;
-    private String CompanyName;
-    private List<CompanyDto> companyDto;
+    private String cName;
+    private CompanyDto company;
 
 }

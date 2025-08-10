@@ -9,9 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompanyDto {
-
-    private String id;
-    private String name;
-    private String Code;
+public class CompanyReq {
+    private String companyName;
+    private String companyCode;
 }

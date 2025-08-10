@@ -35,8 +35,11 @@ public class StatementImp {
         lists.add(statements);
 
         Company company = companyRepo.findByName(stock);
-        statements.setCompanyName(company.getName());
+        statements.setCName(company.getName());
+
+        statements.setCompany(company);
         company.setStatements(lists);
+
         companyRepo.save(company);
     }
 
