@@ -36,7 +36,7 @@ public class User {
         request.getNews().forEach(statement ->
                 news.append(statement).append("\n")
         );
-
+        System.out.println("Before Calling model");
         String response = chatModel.call(news.toString());
 
         List<Map<String, Object>> list = new ArrayList<>();
@@ -50,7 +50,7 @@ public class User {
                 list.add(entry);
             }
         }
-
+        System.out.println("Testing ");
         return new ResponseEntity<>(list, HttpStatus.OK);
 
     }
