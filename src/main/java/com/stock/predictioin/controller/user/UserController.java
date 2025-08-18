@@ -1,6 +1,8 @@
 package com.stock.predictioin.controller.user;
 
 import com.stock.predictioin.dto.NewsStatementDto;
+import com.stock.predictioin.dto.UserDto;
+import com.stock.predictioin.service.UserImp;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,10 +14,13 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/user")
-public class User {
+public class UserController {
 
     @Autowired
     private ChatModel chatModel;
+
+    @Autowired
+    private UserImp userImp;
 
     @PostMapping("/stock/{stock}")
     public ResponseEntity<?> prediction(@PathVariable String stock, @RequestBody NewsStatementDto request){
@@ -24,7 +29,7 @@ public class User {
                 .append(stock)
                 .append(" for the next ")
                 .append(request.getMonths())
-                .append(" months, starting from the upcoming week.\n").append("Today is ").append(LocalDate.now())
+                .append(" months, starting from the upcoming week.\n").append("Today is ").append(LocalDate.now()).append("Also show today current price too")
                 .append("Provide one entry per week, for a total of ")
                 .append(request.getMonths() * 4) // assuming ~4 weeks/month
                 .append(" entries.\n")
@@ -51,8 +56,20 @@ public class User {
             }
         }
         System.out.println("Testing ");
+        list.forEach((a)-> System.out.println(a));
         return new ResponseEntity<>(list, HttpStatus.OK);
 
     }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createAccount(@RequestBody UserDto userDto){
+        return new ResponseEntity<>(userImp.createUser(userDto),HttpStatus.CREATED);
+    }
+
+    @GetMapping("/getUser/{email}")
+    public ResponseEntity<?> createAccount(@PathVariable String email){
+        return new ResponseEntity<>(userImp.getUser(email),HttpStatus.OK);
+    }
+
 
 }
