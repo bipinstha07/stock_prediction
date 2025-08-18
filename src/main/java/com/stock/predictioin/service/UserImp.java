@@ -24,6 +24,7 @@ public class UserImp {
     public UserDto createUser(UserDto userDto){
         User user = modelMapper.map(userDto,User.class);
         user.setId(UUID.randomUUID().toString());
+        user.setIsPremium(true);
         User savedUser = userRepo.save(user);
         return modelMapper.map(savedUser,UserDto.class);
     }
@@ -33,6 +34,8 @@ public class UserImp {
         if(user==null){
             throw new ResourceNotFoundException("No User Found");
         }
+        System.out.println(user.getName());
+        System.out.println(user.getIsPremium());
         return modelMapper.map(user,UserDto.class);
     }
 

@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @GetMapping("/getUser/{email}")
-    public ResponseEntity<?> createAccount(@PathVariable String email){
+    public ResponseEntity<UserDto> createAccount(@PathVariable String email){
         return new ResponseEntity<>(userImp.getUser(email),HttpStatus.OK);
     }
 
