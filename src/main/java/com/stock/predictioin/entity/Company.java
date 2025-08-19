@@ -21,6 +21,8 @@ public class Company {
     private String name;
 
     private String Code;
+    private double price;
+    private String category;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Statements> statements;

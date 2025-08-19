@@ -5,15 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompanyDto {
+public class CompanyStockPriceDto {
 
-    private String id;
-    private String name;
-    private String Code;
-    private double price;
-    private String category;
+    private String code;
+    private String closingPrice;
+    private Date date;
+
 }
