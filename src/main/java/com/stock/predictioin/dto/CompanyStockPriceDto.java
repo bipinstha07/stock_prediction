@@ -12,8 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompanyStockPriceDto {
-
-    private String code;
     private String closingPrice;
     private Date date;
 
