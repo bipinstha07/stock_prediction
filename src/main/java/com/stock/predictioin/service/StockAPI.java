@@ -25,7 +25,7 @@ public class StockAPI {
     @Value("${stock.api.key}")
     private String apiKey;
 
-    public List<CompanyStockPriceDto> getStockPrice(String code) throws IOException, InterruptedException {
+    public List<String> getStockPrice(String code) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=" + code + "&apikey=" + apiKey))
@@ -33,29 +33,27 @@ public class StockAPI {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+
         JSONObject obj = new JSONObject(response.body());
         JSONObject weeklyData = obj.getJSONObject("Weekly Time Series");
 
-        // PriorityQueue for latest dates
         PriorityQueue<String> dates = new PriorityQueue<>((a, b) -> b.compareTo(a));
         Iterator<String> keys = weeklyData.keys();
         while (keys.hasNext()) dates.add(keys.next());
 
-        List<CompanyStockPriceDto> stockPrices = new ArrayList<>();
-
+        List<String> result = new ArrayList<>();
+        System.out.println("here list result");
         for (int i = 0; i < 12 && !dates.isEmpty(); i++) {
             String dateStr = dates.poll();
             double close = Math.round(weeklyData.getJSONObject(dateStr).getDouble("4. close") * 100.0) / 100.0;
 
-            CompanyStockPriceDto dto = new CompanyStockPriceDto();
-            dto.setClosingPrice(String.valueOf(close));
-            dto.setDate(java.sql.Date.valueOf(dateStr)); // parse yyyy-MM-dd
-
-            stockPrices.add(dto);
+            result.add("{date=" + dateStr + ", price=" + close + "}");
         }
-
-        return stockPrices;
+        System.out.println(result);
+        return result;
     }
+
 
 
 }

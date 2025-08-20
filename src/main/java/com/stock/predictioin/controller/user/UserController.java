@@ -29,47 +29,62 @@ public class UserController {
     private StockAPI stockAPI;
 
     @PostMapping("/stock/{stock}")
-    public ResponseEntity<?> prediction(@PathVariable String stock, @RequestBody NewsStatementDto request){
+    public ResponseEntity<?> prediction(@PathVariable String stock, @RequestBody NewsStatementDto request) {
         StringBuilder news = new StringBuilder();
-        news.append("Simulate a hypothetical the weekly closing price for ")
+        news.append("Simulate realistic weekly closing prices for ")
                 .append(stock)
                 .append(" for the next ")
-                .append(request.getMonths())
-                .append(" months, starting from the upcoming week.\n").append("Today is ").append(LocalDate.now()).append("Also show today current price too")
-                .append("Provide one entry per week, for a total of ")
-                .append(request.getMonths() * 4) // assuming ~4 weeks/month
-                .append(" entries.\n")
-                .append("Strictly respond in this exact format: {YYYY-MM-DD:price}, one per line.\n")
-                .append("No explanations, no extra text, only the list.\n\n")
-                .append("News statements:\n");
+                .append(request.getMonths()).append(" months (~")
+                .append(request.getMonths() * 4).append(" weeks).\n")
+                .append("Today is ").append(LocalDate.now()).append(".\n")
+                .append("Start predictions from the last real closing price below.\n")
+                .append("Real historical data (latest first):\n");
 
-
-        request.getNews().forEach(statement ->
-                news.append(statement).append("\n")
+        // 1. Add client-provided history
+        request.getStockPriceHistory().forEach(h ->
+                news.append("{").append(h.getDate()).append(":")
+                        .append(h.getPrice()).append("}\n")
         );
-        System.out.println("Before Calling model");
+
+        System.out.println("Hi I am here ");
+        System.out.println(request.getStockPriceHistory());
+
+        // 2. Add news
+        news.append("\nNow generate future weekly closing prices that follow the trend and react slightly to the news below.\n")
+                .append("Strictly output in format {YYYY-MM-DD:price}, one per line. No explanation.\n\n")
+                .append("News statements:\n")
+                .append("When predicting, do not just make a straight slope." +
+                        "Introduce realistic short-term fluctuations (weekly ups and downs) while keeping the overall long-term trend. \n" +
+                        "Some weeks should dip below the last price, and some should rise above, similar to real stock behavior. \n" +
+                        "Prices must remain within a realistic range compared to the historical data.\n")
+        ;
+
+        request.getNews().forEach(statement -> news.append(statement).append("\n"));
+
+        // 3. Call AI
         String response = chatModel.call(news.toString());
 
-        List<Map<String, Object>> list = new ArrayList<>();
+        // 4. Parse response
+        List<Map<String, Object>> predictions = new ArrayList<>();
         for (String line : response.split("\\r?\\n")) {
             if (line.trim().isEmpty()) continue;
-            String[] parts = line.split(":");
+            String[] parts = line.replace("{", "").replace("}", "").split(":");
             if (parts.length == 2) {
                 Map<String, Object> entry = new HashMap<>();
                 entry.put("date", parts[0].trim());
                 entry.put("price", Double.parseDouble(parts[1].trim()));
-                list.add(entry);
+                predictions.add(entry);
             }
         }
-        System.out.println("Testing ");
-        list.forEach((a)-> System.out.println(a));
-        return new ResponseEntity<>(list, HttpStatus.OK);
 
+        // 5. Return predictions only (or merge with history if you want)
+        return new ResponseEntity<>(predictions, HttpStatus.OK);
     }
 
+
     @GetMapping("/stock/getByCode/{code}")
-    public ResponseEntity<List<CompanyStockPriceDto>> getStock(@PathVariable String code) throws IOException, InterruptedException {
-        System.out.println("HI");
+    public ResponseEntity<?> getStock(@PathVariable String code) throws IOException, InterruptedException {
+        System.out.println("Get Price by Code");
         return new ResponseEntity<>(stockAPI.getStockPrice(code),HttpStatus.OK);
     }
 
